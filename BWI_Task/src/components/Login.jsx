@@ -1,10 +1,44 @@
 import React, { useState } from "react";
 import Logo from "../assets/CartFusion-logos_transparent.png";
-
+import { useAuth } from "../context/login";
+import { CgDanger } from "react-icons/cg";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 const Login = () => {
   const [userName, setUserName] = useState("");
   const [password, setPassword] = useState("");
-  console.log(userName, password);
+  const [error, setError] = useState("");
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  console.log("Username, password:", userName, password);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    axios
+      .post(
+        "https://dummyjson.com/auth/login",
+        {
+          username: userName,
+          password: password, //"username":"rshawe2","password":"OWsTbMUgFc"
+        },
+        { headers: { "Content-Type": "application/json" } }
+      )
+      .then((response) => {
+        console.log(response.data);
+        login(response.data.token);
+        setError(null);
+        navigate("/");
+      })
+      .catch((error) => {
+        console.error("Login Failed", error);
+        if (error.response) {
+          // Only capture the relevant error message
+          setError(error.response.data.message);
+        } else {
+          setError("An unexpected error occurred.");
+        }
+      });
+  };
 
   return (
     <div className="bg-stone-200 flex flex-col items-center justify-center min-h-screen md:py-2">
@@ -15,8 +49,8 @@ const Login = () => {
             CartFusion: Revolutionizing Your Shopping Experience with One Click.
           </p>
         </div>
-        <div className="bg-white rounded-2xl py-14 shadow-2xl flex flex-col w-full md:w-1/3 items-center max-w-4xl transition duration-1000 ease-out">
-          <div className="flex flex-col px-10 py-4 items-center">
+        <div className="bg-white rounded-2xl py-14  shadow-2xl flex flex-col w-3/4 md:w-1/3 items-center max-w-4xl transition duration-1000 ease-out">
+          <div className="flex flex-col px-6 md:px-10 py-4 items-center">
             <img
               src={Logo}
               className="w-auto h-20 bg-transparent "
@@ -27,7 +61,7 @@ const Login = () => {
             </p>
           </div>
           <div className="w-2/3">
-            <form className="">
+            <form className="" onSubmit={handleSubmit}>
               <div>
                 <label className="block mb-2 text-blue-500 " htmlFor="username">
                   Username
@@ -61,6 +95,12 @@ const Login = () => {
                   value="Login"
                 />
               </div>
+              {error && (
+                <div className="bg-red-400 rounded p-2 flex justify-center items-center transition ease-in-out duration-300">
+                  <CgDanger className="text-red-800 w-6" />
+                  <p className="text-red-700">{error}</p>
+                </div>
+              )}
             </form>
           </div>
         </div>

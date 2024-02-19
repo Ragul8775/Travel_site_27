@@ -8,6 +8,7 @@ import {
 import { AuthProvider, useAuth } from "./context/login";
 import Login from "./components/Login";
 import HomePage from "./components/HomePage";
+import ProtectedRoute from "./components/ProtectedRoute";
 const App = () => {
   return (
     <Router>
@@ -17,9 +18,9 @@ const App = () => {
           <Route
             path="/"
             element={
-              <RequireAuth>
+              <ProtectedRoute>
                 <HomePage />
-              </RequireAuth>
+              </ProtectedRoute>
             }
           />
         </Routes>
